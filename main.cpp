@@ -1,5 +1,13 @@
 #include <iostream>
 
+#include <cstddef>
+#include <cstdlib>
+#include <cstring>
+#include <exception>
+#include <random>
+#include <stdexcept>
+#include <vector>
+
 #include <pthread.h>
 
 struct Args
@@ -14,6 +22,24 @@ struct Args
 bool isInside(double x, double y, double r)
 {
   return (x * x + y * y) <= (r * r);
+}
+
+std::size_t calc(double r, std::size_t tests, std::size_t seed)
+{
+  std::mt19937 engine(seed);
+  std::uniform_real_distribution<double> dist(-r, r);
+
+  std::size_t pass = 0;
+  for (std::size_t i = 0; i < tests; ++i)
+  {
+    const double x = dist(engine);
+    const double y = dist(engine);
+    if (isInside(x, y, r))
+    {
+      ++pass;
+    }
+  }
+  return pass;
 }
 
 int main()
