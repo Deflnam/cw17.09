@@ -42,6 +42,20 @@ std::size_t calc(double r, std::size_t tests, std::size_t seed)
   return pass;
 }
 
+void * threadFunc(void * arg)
+{
+  Args * args = static_cast<Args *>(arg);
+  try
+  {
+    args->result_ = calc(args->r_, args->tests_, args->seed_);
+  }
+  catch (...)
+  {
+    args->eptr_ = std::current_exception();
+  }
+  return nullptr;
+}
+
 int main()
 {
   return 0;
