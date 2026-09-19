@@ -56,6 +56,14 @@ void * threadFunc(void * arg)
   return nullptr;
 }
 
+void joinAll(std::vector<pthread_t> & tids, std::size_t count)
+{
+  for (std::size_t i = 0; i < count; ++i)
+  {
+    pthread_join(tids[i], nullptr);
+  }
+}
+
 int main()
 {
   return 0;
