@@ -7,7 +7,6 @@
 #include <random>
 #include <stdexcept>
 #include <vector>
-
 #include <pthread.h>
 
 struct Args
@@ -124,5 +123,23 @@ double area(double r, std::size_t threads, std::size_t tests)
 
 int main()
 {
+  const double r = 5.0;
+  const std::size_t threads = 16;
+  const std::size_t tests = 100000;
+
+  try
+  {
+    const double exact_area = 3.141592653589793 * r * r;
+    const double monte_area = area(r, threads, tests);
+
+    std::cout << "Exact area = " << exact_area << '\n';
+    std::cout << "Monte area = " << monte_area << '\n';
+  }
+  catch (const std::exception & e)
+  {
+    std::cerr << "Error: " << e.what() << '\n';
+    return 1;
+  }
+
   return 0;
 }
