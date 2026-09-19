@@ -64,6 +64,64 @@ void joinAll(std::vector<pthread_t> & tids, std::size_t count)
   }
 }
 
+double area(double r, std::size_t threads, std::size_t tests)
+{
+  if (threads == 0)
+  {
+    throw std::invalid_argument("threads must be > 0");
+  }
+
+  const std::size_t base = tests / threads;
+  const std::size_t rem = tests % threads;
+
+  std::vector<pthread_t> tids(threads);
+  std::vector<Args> args(threads);
+
+  std::size_t created = 0;
+
+  try
+  {
+    for (std::size_t i = 0; i < threads; ++i)
+    {
+      args[i].r_ = r;
+      args[i].tests_ = base + (i < rem ? 1 : 0);
+      args[i].seed_ = 12345 + i;
+      args[i].result_ = 0;
+      args[i].eptr_ = nullptr;
+
+      const int err = pthread_create(&tids[i], nullptr, threadFunc, &args[i]);
+      if (err != 0)
+      {
+        throw std::runtime_error(std::strerror(err));
+      }
+      ++created;
+    }
+  }
+  catch (...)
+  {
+    joinAll(tids, created);
+    throw;
+  }
+
+  joinAll(tids, created);
+
+  for (std::size_t i = 0; i < threads; ++i)
+  {
+    if (args[i].eptr_)
+    {
+      std::rethrow_exception(args[i].eptr_);
+    }
+  }
+
+  std::size_t pass = 0;
+  for (std::size_t i = 0; i < threads; ++i)
+  {
+    pass += args[i].result_;
+  }
+
+  return static_cast<double>(pass) / static_cast<double>(tests) * 4.0 * r * r;
+}
+
 int main()
 {
   return 0;
